@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST.in
+README.md
+setup.py
+github_http_api.egg-info/PKG-INFO
+github_http_api.egg-info/SOURCES.txt
+github_http_api.egg-info/dependency_links.txt
+github_http_api.egg-info/requires.txt
+github_http_api.egg-info/top_level.txt

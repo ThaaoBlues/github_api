@@ -1,1 +1,1 @@
-github_api
+github_http_api
