@@ -11,7 +11,7 @@
 <section id="section-intro"><details class="source"><summary><span>Expand source code</span></summary>
 
     from requests import get
-    from json import loads
+    from typing import List
 
     class UserNotFoundException(Exception):
         """
@@ -133,7 +133,7 @@
             else:
                 return True
 
-        def get_release_download_count(self,repository_full_name:str,release_number:int=0) -> int:
+        def get_release_download_count(self,repository_full_name:str,release_number:int=0) -> List[tuple]:
             """
 
             :param: release_number (default is 0), the more you increase it, the more the release will be an old one.
@@ -166,6 +166,71 @@
 
             return [(asset['name'],asset['download_count']) for asset in assets]
 
+        def get_release_infos(self,repository_full_name:str,release_number:int=0) -> List[dict]:
+
+            """
+
+            :param: release_number (default is 0), the more you increase it, the more the release 
+            will be an old one.
+
+            :returns: a dict of all the release stats that may be boring but quite usefull sometimes
+
+                - creation_date : when the release has been created (str)
+
+                - release_date : when the release has been..released :) (str)
+
+                - released_by : author of the release (github login) (str)
+
+                - version : tag name of the release (ofter the version) (str)
+
+                - title : title of the release (str)
+
+                - desc : description of the release (str)
+
+                - assets : assets files names (list of str)
+
+            :raises: InvalidRepoNameException
+
+            :raises: InvalidReleaseIndexException
+
+            :raises: NoReleaseException
+
+            """
+
+            #get http response content
+            json = get(f"{self.base_repos_url}{repository_full_name}/releases").json()
+
+            #takes care of exceptions
+            if json == []:
+                raise NoReleaseException
+            elif not self.repo_exists(repository_full_name):
+                raise InvalidRepoNameException
+            elif release_number > len(json):
+                raise InvalidReleaseIndexException
+
+            #now that we are sure no errors are coming, get the right release
+            json = json[release_number]
+
+            return {'title':json['name'],'version':json['tag_name'],'desc':json['body'],"creation_date":json['created_at'],"release_date":json['published_at'],"released_by":json['author']['login'],"assets":[asset[0] for asset in self.get_release_download_count(repository_full_name,release_number=release_number)]}
+
+        def get_raw_file_content(self):
+            """
+            coming soon
+            """
+            pass
+
+        def get_release_asset_download_link() -> str:
+            """
+            coming soon
+            """
+            pass
+
+        def download_release_asset(self):
+            """
+            coming soon
+            """
+            pass
+
         def get_user_infos(self,username:str) -> dict:
 
             """
@@ -177,7 +242,7 @@
 
             - name (str)
 
-            - twitter_account (empty if not) (str)
+            - twitter_account (null if not) (str)
 
             - followers (list of usernames)
 
@@ -185,13 +250,13 @@
 
             - starred_repos (list of urls)
 
-            - blog_url (empty if not) (str)
+            - blog_url (null if not) (str)
 
-            - is_hireable (empty if not specified) (bool)
+            - is_hireable (null if not specified) (bool)
 
-            - email (empty if not specified) (str)
+            - email (null if not specified) (str)
 
-            - user_location (empty if not specified) (str)
+            - user_location (null if not specified) (str)
 
             - user_type (str)
 
@@ -224,7 +289,7 @@
 
         gh = github_api()
 
-        print(gh.get_release_download_count("copypastaofficial/copypasta"))
+        print(gh.get_release_infos("copypastaofficial/copypasta"))
 
 </details></section>
 
@@ -458,7 +523,7 @@ message – explanation of the error
             else:
                 return True
 
-        def get_release_download_count(self,repository_full_name:str,release_number:int=0) -> int:
+        def get_release_download_count(self,repository_full_name:str,release_number:int=0) -> List[tuple]:
             """
 
             :param: release_number (default is 0), the more you increase it, the more the release will be an old one.
@@ -491,6 +556,71 @@ message – explanation of the error
 
             return [(asset['name'],asset['download_count']) for asset in assets]
 
+        def get_release_infos(self,repository_full_name:str,release_number:int=0) -> List[dict]:
+
+            """
+
+            :param: release_number (default is 0), the more you increase it, the more the release 
+            will be an old one.
+
+            :returns: a dict of all the release stats that may be boring but quite usefull sometimes
+
+                - creation_date : when the release has been created (str)
+
+                - release_date : when the release has been..released :) (str)
+
+                - released_by : author of the release (github login) (str)
+
+                - version : tag name of the release (ofter the version) (str)
+
+                - title : title of the release (str)
+
+                - desc : description of the release (str)
+
+                - assets : assets files names (list of str)
+
+            :raises: InvalidRepoNameException
+
+            :raises: InvalidReleaseIndexException
+
+            :raises: NoReleaseException
+
+            """
+
+            #get http response content
+            json = get(f"{self.base_repos_url}{repository_full_name}/releases").json()
+
+            #takes care of exceptions
+            if json == []:
+                raise NoReleaseException
+            elif not self.repo_exists(repository_full_name):
+                raise InvalidRepoNameException
+            elif release_number > len(json):
+                raise InvalidReleaseIndexException
+
+            #now that we are sure no errors are coming, get the right release
+            json = json[release_number]
+
+            return {'title':json['name'],'version':json['tag_name'],'desc':json['body'],"creation_date":json['created_at'],"release_date":json['published_at'],"released_by":json['author']['login'],"assets":[asset[0] for asset in self.get_release_download_count(repository_full_name,release_number=release_number)]}
+
+        def get_raw_file_content(self):
+            """
+            coming soon
+            """
+            pass
+
+        def get_release_asset_download_link() -> str:
+            """
+            coming soon
+            """
+            pass
+
+        def download_release_asset(self):
+            """
+            coming soon
+            """
+            pass
+
         def get_user_infos(self,username:str) -> dict:
 
             """
@@ -502,7 +632,7 @@ message – explanation of the error
 
             - name (str)
 
-            - twitter_account (empty if not) (str)
+            - twitter_account (null if not) (str)
 
             - followers (list of usernames)
 
@@ -510,13 +640,13 @@ message – explanation of the error
 
             - starred_repos (list of urls)
 
-            - blog_url (empty if not) (str)
+            - blog_url (null if not) (str)
 
-            - is_hireable (empty if not specified) (bool)
+            - is_hireable (null if not specified) (bool)
 
-            - email (empty if not specified) (str)
+            - email (null if not specified) (str)
 
-            - user_location (empty if not specified) (str)
+            - user_location (null if not specified) (str)
 
             - user_type (str)
 
@@ -551,7 +681,67 @@ message – explanation of the error
 
 <dl>
 
-<dt id="github_api.main.github_api.get_release_download_count">`<span>def <span class="ident">get_release_download_count</span></span>(<span>self, repository_full_name: str, release_number: int = 0) ‑> int</span>`</dt>
+<dt id="github_api.main.github_api.download_release_asset">`<span>def <span class="ident">download_release_asset</span></span>(<span>self)</span>`</dt>
+
+<dd>
+
+<div class="desc">
+
+coming soon
+
+</div>
+
+<details class="source"><summary><span>Expand source code</span></summary>
+
+    def download_release_asset(self):
+        """
+        coming soon
+        """
+        pass
+
+</details></dd>
+
+<dt id="github_api.main.github_api.get_raw_file_content">`<span>def <span class="ident">get_raw_file_content</span></span>(<span>self)</span>`</dt>
+
+<dd>
+
+<div class="desc">
+
+coming soon
+
+</div>
+
+<details class="source"><summary><span>Expand source code</span></summary>
+
+    def get_raw_file_content(self):
+        """
+        coming soon
+        """
+        pass
+
+</details></dd>
+
+<dt id="github_api.main.github_api.get_release_asset_download_link">`<span>def <span class="ident">get_release_asset_download_link</span></span>(<span>) ‑> str</span>`</dt>
+
+<dd>
+
+<div class="desc">
+
+coming soon
+
+</div>
+
+<details class="source"><summary><span>Expand source code</span></summary>
+
+    def get_release_asset_download_link() -> str:
+        """
+        coming soon
+        """
+        pass
+
+</details></dd>
+
+<dt id="github_api.main.github_api.get_release_download_count">`<span>def <span class="ident">get_release_download_count</span></span>(<span>self, repository_full_name: str, release_number: int = 0) ‑> List[tuple]</span>`</dt>
 
 <dd>
 
@@ -571,7 +761,7 @@ message – explanation of the error
 
 <details class="source"><summary><span>Expand source code</span></summary>
 
-    def get_release_download_count(self,repository_full_name:str,release_number:int=0) -> int:
+    def get_release_download_count(self,repository_full_name:str,release_number:int=0) -> List[tuple]:
         """
 
         :param: release_number (default is 0), the more you increase it, the more the release will be an old one.
@@ -606,6 +796,89 @@ message – explanation of the error
 
 </details></dd>
 
+<dt id="github_api.main.github_api.get_release_infos">`<span>def <span class="ident">get_release_infos</span></span>(<span>self, repository_full_name: str, release_number: int = 0) ‑> List[dict]</span>`</dt>
+
+<dd>
+
+<div class="desc">
+
+:param: release_number (default is 0), the more you increase it, the more the release will be an old one.
+
+:returns: a dict of all the release stats that may be boring but quite usefull sometimes
+
+    - creation_date : when the release has been created (str)
+
+    - release_date : when the release has been..released :) (str)
+
+    - released_by : author of the release (github login) (str)
+
+    - version : tag name of the release (ofter the version) (str)
+
+    - title : title of the release (str)
+
+    - desc : description of the release (str)
+
+    - assets : assets files names (list of str)
+
+:raises: InvalidRepoNameException
+
+:raises: InvalidReleaseIndexException
+
+:raises: NoReleaseException
+
+</div>
+
+<details class="source"><summary><span>Expand source code</span></summary>
+
+    def get_release_infos(self,repository_full_name:str,release_number:int=0) -> List[dict]:
+
+        """
+
+        :param: release_number (default is 0), the more you increase it, the more the release 
+        will be an old one.
+
+        :returns: a dict of all the release stats that may be boring but quite usefull sometimes
+
+            - creation_date : when the release has been created (str)
+
+            - release_date : when the release has been..released :) (str)
+
+            - released_by : author of the release (github login) (str)
+
+            - version : tag name of the release (ofter the version) (str)
+
+            - title : title of the release (str)
+
+            - desc : description of the release (str)
+
+            - assets : assets files names (list of str)
+
+        :raises: InvalidRepoNameException
+
+        :raises: InvalidReleaseIndexException
+
+        :raises: NoReleaseException
+
+        """
+
+        #get http response content
+        json = get(f"{self.base_repos_url}{repository_full_name}/releases").json()
+
+        #takes care of exceptions
+        if json == []:
+            raise NoReleaseException
+        elif not self.repo_exists(repository_full_name):
+            raise InvalidRepoNameException
+        elif release_number > len(json):
+            raise InvalidReleaseIndexException
+
+        #now that we are sure no errors are coming, get the right release
+        json = json[release_number]
+
+        return {'title':json['name'],'version':json['tag_name'],'desc':json['body'],"creation_date":json['created_at'],"release_date":json['published_at'],"released_by":json['author']['login'],"assets":[asset[0] for asset in self.get_release_download_count(repository_full_name,release_number=release_number)]}
+
+</details></dd>
+
 <dt id="github_api.main.github_api.get_user_infos">`<span>def <span class="ident">get_user_infos</span></span>(<span>self, username: str) ‑> dict</span>`</dt>
 
 <dd>
@@ -620,7 +893,7 @@ get additionnal informations on a user like
 
 *   name (str)
 
-*   twitter_account (empty if not) (str)
+*   twitter_account (null if not) (str)
 
 *   followers (list of usernames)
 
@@ -628,13 +901,13 @@ get additionnal informations on a user like
 
 *   starred_repos (list of urls)
 
-*   blog_url (empty if not) (str)
+*   blog_url (null if not) (str)
 
-*   is_hireable (empty if not specified) (bool)
+*   is_hireable (null if not specified) (bool)
 
-*   email (empty if not specified) (str)
+*   email (null if not specified) (str)
 
-*   user_location (empty if not specified) (str)
+*   user_location (null if not specified) (str)
 
 *   user_type (str)
 
@@ -663,7 +936,7 @@ get additionnal informations on a user like
 
         - name (str)
 
-        - twitter_account (empty if not) (str)
+        - twitter_account (null if not) (str)
 
         - followers (list of usernames)
 
@@ -671,13 +944,13 @@ get additionnal informations on a user like
 
         - starred_repos (list of urls)
 
-        - blog_url (empty if not) (str)
+        - blog_url (null if not) (str)
 
-        - is_hireable (empty if not specified) (bool)
+        - is_hireable (null if not specified) (bool)
 
-        - email (empty if not specified) (str)
+        - email (null if not specified) (str)
 
-        - user_location (empty if not specified) (str)
+        - user_location (null if not specified) (str)
 
         - user_type (str)
 
@@ -829,7 +1102,11 @@ list the publics repositories of the specified user
 
     *   #### `[github_api](#github_api.main.github_api "github_api.main.github_api")`
 
+        *   `[download_release_asset](#github_api.main.github_api.download_release_asset "github_api.main.github_api.download_release_asset")`
+        *   `[get_raw_file_content](#github_api.main.github_api.get_raw_file_content "github_api.main.github_api.get_raw_file_content")`
+        *   `[get_release_asset_download_link](#github_api.main.github_api.get_release_asset_download_link "github_api.main.github_api.get_release_asset_download_link")`
         *   `[get_release_download_count](#github_api.main.github_api.get_release_download_count "github_api.main.github_api.get_release_download_count")`
+        *   `[get_release_infos](#github_api.main.github_api.get_release_infos "github_api.main.github_api.get_release_infos")`
         *   `[get_user_infos](#github_api.main.github_api.get_user_infos "github_api.main.github_api.get_user_infos")`
         *   `[get_user_repos](#github_api.main.github_api.get_user_repos "github_api.main.github_api.get_user_repos")`
         *   `[login](#github_api.main.github_api.login "github_api.main.github_api.login")`
