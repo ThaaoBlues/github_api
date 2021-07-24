@@ -193,6 +193,8 @@ class github_api():
         pass
 
 
+
+
     def get_user_infos(self,username:str) -> dict:
 
         """
@@ -246,6 +248,8 @@ class github_api():
         starred_repos = [repo['html_url'] for repo in get(json['starred_url'].replace("{/owner}{/repo}","",1)).json()]
 
         return {"id": json['id'],"bio":json['bio'],"name":json['name'],"twitter_account":json['twitter_username'],"followers" : [f['login'] for f in followers], "following":[f['login'] for f in following],"starred_repos": starred_repos,"blog_url":json['blog'],"is_hireable":json['hireable'],"email":json['email'],"user_location":json['location'],"user_type":json['type'],"avatar_url":json['avatar_url'],"company":json['company'],"creation_date":json['created_at']}
+
+
 
 
 
