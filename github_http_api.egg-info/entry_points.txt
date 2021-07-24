@@ -1,0 +1,3 @@
+[console_scripts]
+pmanager_cli = pmanager.__main__:main
+

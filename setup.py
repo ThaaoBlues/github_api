@@ -10,9 +10,9 @@ import os
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = 'github_api'
+NAME = 'github_http_api'
 DESCRIPTION = 'A simple github HTTP api handler in python.'
-URL = 'https://github.com/ThaaoBlues/pmanager'
+URL = 'https://github.com/ThaaoBlues/github_api'
 EMAIL = 'thaaoblues81@gmail.com'
 AUTHOR = '_ThaaoBlues_'
 REQUIRES_PYTHON = '>=3.6.0'
