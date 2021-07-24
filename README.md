@@ -10,7 +10,7 @@
 
 * install it by typing ``python -m pip install github-http-api``
 
-* example of use available in the file ``example.py``
+* example of use available in the file [example.py](https://github.com/ThaaoBlues/github_api/blob/master/example.py)
 
 </header>
 
