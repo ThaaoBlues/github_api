@@ -29,59 +29,7 @@
 <pre><code class="python">from requests import get
 from typing import List
 
-class UserNotFoundException(Exception):
-    &#34;&#34;&#34;
-    Exception raised if an username don&#39;t exists.
 
-    Attributes:
-        message -- explanation of the error
-
-    &#34;&#34;&#34;
-
-    def __init__(self, message=&#34;Username not found on github.&#34;):
-        self.message = message
-        super().__init__(self.message)
-
-
-class InvalidRepoNameException(Exception):
-    &#34;&#34;&#34;
-    Exception raised if a repository name does not exists or is malformed
-
-    Attributes:
-        message -- explanation of the error
-
-    &#34;&#34;&#34;
-
-    def __init__(self, message=&#34;Invalid repository name. It must look like : thaaoblues/github_api&#34;):
-        self.message = message
-        super().__init__(self.message)
-
-class InvalidReleaseIndexException(Exception):
-    &#34;&#34;&#34;
-    Exception raised if you decided to pass a certain release index to get stats not on the lastest but this index does not exists.
-
-    Attributes:
-        message -- explanation of the error
-
-    &#34;&#34;&#34;
-
-    def __init__(self, message=&#34;Invalid release index. The user must not have released that amount of versions&#34;):
-        self.message = message
-        super().__init__(self.message)
-
-
-class NoReleaseException(Exception):
-    &#34;&#34;&#34;
-    Exception raised if you wanted to get stats from a release but the repo does not have any.
-
-    Attributes:
-        message -- explanation of the error
-
-    &#34;&#34;&#34;
-
-    def __init__(self, message=&#34;No release found. The user must not have released anything.&#34;):
-        self.message = message
-        super().__init__(self.message)
 
 
 class github_api():
@@ -331,16 +279,59 @@ class github_api():
 
 
 
+class UserNotFoundException(Exception):
+    &#34;&#34;&#34;
+    Exception raised if an username don&#39;t exists.
+
+    Attributes:
+        message -- explanation of the error
+
+    &#34;&#34;&#34;
+
+    def __init__(self, message=&#34;Username not found on github.&#34;):
+        self.message = message
+        super().__init__(self.message)
 
 
+class InvalidRepoNameException(Exception):
+    &#34;&#34;&#34;
+    Exception raised if a repository name does not exists or is malformed
 
-if __name__ == &#34;__main__&#34;:
+    Attributes:
+        message -- explanation of the error
 
-    gh = github_api()
+    &#34;&#34;&#34;
 
-    print(gh.get_release_infos(&#34;copypastaofficial/copypasta&#34;))
+    def __init__(self, message=&#34;Invalid repository name. It must look like : thaaoblues/github_api&#34;):
+        self.message = message
+        super().__init__(self.message)
 
-    </code></pre>
+class InvalidReleaseIndexException(Exception):
+    &#34;&#34;&#34;
+    Exception raised if you decided to pass a certain release index to get stats not on the lastest but this index does not exists.
+
+    Attributes:
+        message -- explanation of the error
+
+    &#34;&#34;&#34;
+
+    def __init__(self, message=&#34;Invalid release index. The user must not have released that amount of versions&#34;):
+        self.message = message
+        super().__init__(self.message)
+
+
+class NoReleaseException(Exception):
+    &#34;&#34;&#34;
+    Exception raised if you wanted to get stats from a release but the repo does not have any.
+
+    Attributes:
+        message -- explanation of the error
+
+    &#34;&#34;&#34;
+
+    def __init__(self, message=&#34;No release found. The user must not have released anything.&#34;):
+        self.message = message
+        super().__init__(self.message)</code></pre>
 </details>
 </section>
 <section>

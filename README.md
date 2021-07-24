@@ -13,58 +13,6 @@
     from requests import get
     from typing import List
 
-    class UserNotFoundException(Exception):
-        """
-        Exception raised if an username don't exists.
-
-        Attributes:
-            message -- explanation of the error
-
-        """
-
-        def __init__(self, message="Username not found on github."):
-            self.message = message
-            super().__init__(self.message)
-
-    class InvalidRepoNameException(Exception):
-        """
-        Exception raised if a repository name does not exists or is malformed
-
-        Attributes:
-            message -- explanation of the error
-
-        """
-
-        def __init__(self, message="Invalid repository name. It must look like : thaaoblues/github_api"):
-            self.message = message
-            super().__init__(self.message)
-
-    class InvalidReleaseIndexException(Exception):
-        """
-        Exception raised if you decided to pass a certain release index to get stats not on the lastest but this index does not exists.
-
-        Attributes:
-            message -- explanation of the error
-
-        """
-
-        def __init__(self, message="Invalid release index. The user must not have released that amount of versions"):
-            self.message = message
-            super().__init__(self.message)
-
-    class NoReleaseException(Exception):
-        """
-        Exception raised if you wanted to get stats from a release but the repo does not have any.
-
-        Attributes:
-            message -- explanation of the error
-
-        """
-
-        def __init__(self, message="No release found. The user must not have released anything."):
-            self.message = message
-            super().__init__(self.message)
-
     class github_api():
 
         def __init__(self):
@@ -285,11 +233,57 @@
 
             return {"id": json['id'],"bio":json['bio'],"name":json['name'],"twitter_account":json['twitter_username'],"followers" : [f['login'] for f in followers], "following":[f['login'] for f in following],"starred_repos": starred_repos,"blog_url":json['blog'],"is_hireable":json['hireable'],"email":json['email'],"user_location":json['location'],"user_type":json['type'],"avatar_url":json['avatar_url'],"company":json['company'],"creation_date":json['created_at']}
 
-    if __name__ == "__main__":
+    class UserNotFoundException(Exception):
+        """
+        Exception raised if an username don't exists.
 
-        gh = github_api()
+        Attributes:
+            message -- explanation of the error
 
-        print(gh.get_release_infos("copypastaofficial/copypasta"))
+        """
+
+        def __init__(self, message="Username not found on github."):
+            self.message = message
+            super().__init__(self.message)
+
+    class InvalidRepoNameException(Exception):
+        """
+        Exception raised if a repository name does not exists or is malformed
+
+        Attributes:
+            message -- explanation of the error
+
+        """
+
+        def __init__(self, message="Invalid repository name. It must look like : thaaoblues/github_api"):
+            self.message = message
+            super().__init__(self.message)
+
+    class InvalidReleaseIndexException(Exception):
+        """
+        Exception raised if you decided to pass a certain release index to get stats not on the lastest but this index does not exists.
+
+        Attributes:
+            message -- explanation of the error
+
+        """
+
+        def __init__(self, message="Invalid release index. The user must not have released that amount of versions"):
+            self.message = message
+            super().__init__(self.message)
+
+    class NoReleaseException(Exception):
+        """
+        Exception raised if you wanted to get stats from a release but the repo does not have any.
+
+        Attributes:
+            message -- explanation of the error
+
+        """
+
+        def __init__(self, message="No release found. The user must not have released anything."):
+            self.message = message
+            super().__init__(self.message)
 
 </details></section>
 
