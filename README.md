@@ -4,7 +4,7 @@
 
 <header>
 
-# Module `github_api.github_api`
+# Package `github_api`
 
 </header>
 
@@ -13,7 +13,7 @@
     from requests import get
     from typing import List
 
-    class github_api():
+    class GithubHTTPApi():
 
         def __init__(self):
             self.ac_username = ""
@@ -22,6 +22,7 @@
             #best api endpoints 
             self.base_repos_url = "https://api.github.com/repos/"
             self.base_user_url = "https://api.github.com/users/"
+            self.base_raw_url = "https://raw.githubusercontent.com/"
 
         def login():
             pass
@@ -84,15 +85,18 @@
         def get_release_download_count(self,repository_full_name:str,release_number:int=0) -> List[tuple]:
             """
 
-            :param: release_number (default is 0), the more you increase it, the more the release will be an old one.
+            :param repository_full_name: the repository full name like thaaoblues/github_api
+
+            :param release_number: (default is 0), the more you increase it, the more the release 
+            will be an old one.
 
             :returns: the release download count by assets (list of tuples ('asset_name',downloads_count) (from the lastest release by default) 
 
-            :raises: InvalidRepoNameException
+            :raises InvalidRepoNameException:
 
-            :raises: InvalidReleaseIndexException
+            :raises InvalidReleaseIndexException:
 
-            :raises: NoReleaseException
+            :raises NoReleaseException:
 
             """
 
@@ -118,7 +122,9 @@
 
             """
 
-            :param: release_number (default is 0), the more you increase it, the more the release 
+            :param repository_full_name: the repository full name like thaaoblues/github_api
+
+            :param release_number: (default is 0), the more you increase it, the more the release 
             will be an old one.
 
             :returns: a dict of all the release stats that may be boring but quite usefull sometimes
@@ -137,11 +143,11 @@
 
                 - assets : assets files names (list of str)
 
-            :raises: InvalidRepoNameException
+            :raises InvalidRepoNameException:
 
-            :raises: InvalidReleaseIndexException
+            :raises InvalidReleaseIndexException:
 
-            :raises: NoReleaseException
+            :raises NoReleaseException:
 
             """
 
@@ -161,23 +167,99 @@
 
             return {'title':json['name'],'version':json['tag_name'],'desc':json['body'],"creation_date":json['created_at'],"release_date":json['published_at'],"released_by":json['author']['login'],"assets":[asset[0] for asset in self.get_release_download_count(repository_full_name,release_number=release_number)]}
 
-        def get_raw_file_content(self):
+        def get_raw_file_content(self,repository_full_name:str,file_name:str) -> str:
             """
-            coming soon
-            """
-            pass
+            :param repository_full_name: the repository full name like thaaoblues/github_api
 
-        def get_release_asset_download_link() -> str:
-            """
-            coming soon
-            """
-            pass
+            :param file_name: the file which you wanna get the raw content
 
-        def download_release_asset(self):
+            :raises InvalidRepoNameException:
+
+            :raises UnknownFileException:
+
+            :returns: a string containing the raw file content
             """
-            coming soon
+
+            if not self.repo_exists(repository_full_name):
+                raise InvalidRepoNameException
+
+            content = get(f"{self.base_raw_url}{repository_full_name}/master/{file_name}").text
+
+            if content == "404: Not Found":
+                raise UnknownFileException
+
+            return content
+
+        def get_release_asset_download_link(self,repository_full_name:str,asset_name:str,release_number:int=0) -> str:
             """
-            pass
+
+            :param repository_full_name: the repository full name like thaaoblues/github_api
+
+            :param asset_name: the release asset file name 
+
+            :param release_number:  (default is 0), the more you increase it, the more the release 
+            will be an old one.
+
+            :returns: a string containing the release asset's download url
+
+            :raises InvalidRepoNameException:
+
+            :raises InvalidReleaseIndexException:
+
+            :raises NoReleaseException:
+
+            :raises UnknownAssetException:
+            """
+
+            #get http response content
+            json = get(f"{self.base_repos_url}{repository_full_name}/releases").json()
+
+            #takes care of exceptions
+            if json == []:
+                raise NoReleaseException
+
+            elif not self.repo_exists(repository_full_name):
+                raise InvalidRepoNameException
+
+            elif release_number > len(json):
+                raise InvalidReleaseIndexException
+
+            json = json[release_number]
+
+            for asset in json['assets']:
+                if asset['name'] == asset_name:
+                    return asset['browser_download_url']
+
+            raise UnknownAssetException
+
+        def download_release_asset(self,repository_full_name:str,asset_name:str,release_number:int=0,output_path:str=""):
+            """
+
+            :param repository_full_name: the repository full name like thaaoblues/github_api
+
+            :param asset_name: the release asset file name
+
+            :param release_number:  (default is 0), the more you increase it, the more the release 
+            will be an old one.
+
+            :param output_path: (default is cwd), the path where the asset will be stored after download. 
+
+            :returns: nothing
+
+            :raises InvalidRepoNameException:
+
+            :raises InvalidReleaseIndexException:
+
+            :raises NoReleaseException:
+
+            :raises UnknownAssetException:
+            """
+
+            url = self.get_release_asset_download_link(repository_full_name,asset_name,release_number=release_number)
+
+            with open(f"{output_path}/{asset_name}" if output_path != "" else asset_name,"wb") as f:
+                f.write(get(url).content)
+                f.close()
 
         def get_user_infos(self,username:str) -> dict:
 
@@ -214,7 +296,7 @@
 
             - creation_date (str)
 
-            :raises: UserNotFoundException if user is not found
+            :raises UserNotFoundException if user is not found:
 
             :returns: A dict with the upper specified keys
 
@@ -285,18 +367,45 @@
             self.message = message
             super().__init__(self.message)
 
+    class UnknownAssetException(Exception):
+        """
+        Exception raised if you wanted to get download url for a specific release's asset but no assets has this name.
+
+        Attributes:
+            message -- explanation of the error
+
+        """
+
+        def __init__(self, message="No release's assets found with this name."):
+            self.message = message
+            super().__init__(self.message)
+
+    class UnknownFileException(Exception):
+        """
+        Exception raised if you wanted to get raw content for a specific file but the file does not exists.
+
+        Attributes:
+            message -- explanation of the error
+
+        """
+
+        def __init__(self, message="No file found with this name."):
+            self.message = message
+            super().__init__(self.message)
+
 </details></section>
 
 <section>
 
 ## Classes
 
+<dl>
 
-<dt id="github_api.github_api.github_api">`<span>class <span class="ident">github_api</span></span>`</dt>
+<dt id="github_api.GithubHTTPApi">`<span>class <span class="ident">GithubHTTPApi</span></span>`</dt>
 
 <dd><details class="source"><summary><span>Expand source code</span></summary>
 
-    class github_api():
+    class GithubHTTPApi():
 
         def __init__(self):
             self.ac_username = ""
@@ -305,6 +414,7 @@
             #best api endpoints 
             self.base_repos_url = "https://api.github.com/repos/"
             self.base_user_url = "https://api.github.com/users/"
+            self.base_raw_url = "https://raw.githubusercontent.com/"
 
         def login():
             pass
@@ -367,15 +477,18 @@
         def get_release_download_count(self,repository_full_name:str,release_number:int=0) -> List[tuple]:
             """
 
-            :param: release_number (default is 0), the more you increase it, the more the release will be an old one.
+            :param repository_full_name: the repository full name like thaaoblues/github_api
+
+            :param release_number: (default is 0), the more you increase it, the more the release 
+            will be an old one.
 
             :returns: the release download count by assets (list of tuples ('asset_name',downloads_count) (from the lastest release by default) 
 
-            :raises: InvalidRepoNameException
+            :raises InvalidRepoNameException:
 
-            :raises: InvalidReleaseIndexException
+            :raises InvalidReleaseIndexException:
 
-            :raises: NoReleaseException
+            :raises NoReleaseException:
 
             """
 
@@ -401,7 +514,9 @@
 
             """
 
-            :param: release_number (default is 0), the more you increase it, the more the release 
+            :param repository_full_name: the repository full name like thaaoblues/github_api
+
+            :param release_number: (default is 0), the more you increase it, the more the release 
             will be an old one.
 
             :returns: a dict of all the release stats that may be boring but quite usefull sometimes
@@ -420,11 +535,11 @@
 
                 - assets : assets files names (list of str)
 
-            :raises: InvalidRepoNameException
+            :raises InvalidRepoNameException:
 
-            :raises: InvalidReleaseIndexException
+            :raises InvalidReleaseIndexException:
 
-            :raises: NoReleaseException
+            :raises NoReleaseException:
 
             """
 
@@ -444,23 +559,99 @@
 
             return {'title':json['name'],'version':json['tag_name'],'desc':json['body'],"creation_date":json['created_at'],"release_date":json['published_at'],"released_by":json['author']['login'],"assets":[asset[0] for asset in self.get_release_download_count(repository_full_name,release_number=release_number)]}
 
-        def get_raw_file_content(self):
+        def get_raw_file_content(self,repository_full_name:str,file_name:str) -> str:
             """
-            coming soon
-            """
-            pass
+            :param repository_full_name: the repository full name like thaaoblues/github_api
 
-        def get_release_asset_download_link() -> str:
-            """
-            coming soon
-            """
-            pass
+            :param file_name: the file which you wanna get the raw content
 
-        def download_release_asset(self):
+            :raises InvalidRepoNameException:
+
+            :raises UnknownFileException:
+
+            :returns: a string containing the raw file content
             """
-            coming soon
+
+            if not self.repo_exists(repository_full_name):
+                raise InvalidRepoNameException
+
+            content = get(f"{self.base_raw_url}{repository_full_name}/master/{file_name}").text
+
+            if content == "404: Not Found":
+                raise UnknownFileException
+
+            return content
+
+        def get_release_asset_download_link(self,repository_full_name:str,asset_name:str,release_number:int=0) -> str:
             """
-            pass
+
+            :param repository_full_name: the repository full name like thaaoblues/github_api
+
+            :param asset_name: the release asset file name 
+
+            :param release_number:  (default is 0), the more you increase it, the more the release 
+            will be an old one.
+
+            :returns: a string containing the release asset's download url
+
+            :raises InvalidRepoNameException:
+
+            :raises InvalidReleaseIndexException:
+
+            :raises NoReleaseException:
+
+            :raises UnknownAssetException:
+            """
+
+            #get http response content
+            json = get(f"{self.base_repos_url}{repository_full_name}/releases").json()
+
+            #takes care of exceptions
+            if json == []:
+                raise NoReleaseException
+
+            elif not self.repo_exists(repository_full_name):
+                raise InvalidRepoNameException
+
+            elif release_number > len(json):
+                raise InvalidReleaseIndexException
+
+            json = json[release_number]
+
+            for asset in json['assets']:
+                if asset['name'] == asset_name:
+                    return asset['browser_download_url']
+
+            raise UnknownAssetException
+
+        def download_release_asset(self,repository_full_name:str,asset_name:str,release_number:int=0,output_path:str=""):
+            """
+
+            :param repository_full_name: the repository full name like thaaoblues/github_api
+
+            :param asset_name: the release asset file name
+
+            :param release_number:  (default is 0), the more you increase it, the more the release 
+            will be an old one.
+
+            :param output_path: (default is cwd), the path where the asset will be stored after download. 
+
+            :returns: nothing
+
+            :raises InvalidRepoNameException:
+
+            :raises InvalidReleaseIndexException:
+
+            :raises NoReleaseException:
+
+            :raises UnknownAssetException:
+            """
+
+            url = self.get_release_asset_download_link(repository_full_name,asset_name,release_number=release_number)
+
+            with open(f"{output_path}/{asset_name}" if output_path != "" else asset_name,"wb") as f:
+                f.write(get(url).content)
+                f.close()
 
         def get_user_infos(self,username:str) -> dict:
 
@@ -497,7 +688,7 @@
 
             - creation_date (str)
 
-            :raises: UserNotFoundException if user is not found
+            :raises UserNotFoundException if user is not found:
 
             :returns: A dict with the upper specified keys
 
@@ -522,81 +713,197 @@
 
 <dl>
 
-<dt id="github_api.github_api.github_api.download_release_asset">`<span>def <span class="ident">download_release_asset</span></span>(<span>self)</span>`</dt>
+<dt id="github_api.GithubHTTPApi.download_release_asset">`<span>def <span class="ident">download_release_asset</span></span>(<span>self, repository_full_name: str, asset_name: str, release_number: int = 0, output_path: str = '')</span>`</dt>
 
 <dd>
 
 <div class="desc">
 
-coming soon
+:param repository_full_name: the repository full name like thaaoblues/github_api
+
+:param asset_name: the release asset file name
+
+:param release_number: (default is 0), the more you increase it, the more the release will be an old one.
+
+:param output_path: (default is cwd), the path where the asset will be stored after download.
+
+:returns: nothing
+
+:raises InvalidRepoNameException:
+
+:raises InvalidReleaseIndexException:
+
+:raises NoReleaseException:
+
+:raises UnknownAssetException:
 
 </div>
 
 <details class="source"><summary><span>Expand source code</span></summary>
 
-    def download_release_asset(self):
+    def download_release_asset(self,repository_full_name:str,asset_name:str,release_number:int=0,output_path:str=""):
         """
-        coming soon
+
+        :param repository_full_name: the repository full name like thaaoblues/github_api
+
+        :param asset_name: the release asset file name
+
+        :param release_number:  (default is 0), the more you increase it, the more the release 
+        will be an old one.
+
+        :param output_path: (default is cwd), the path where the asset will be stored after download. 
+
+        :returns: nothing
+
+        :raises InvalidRepoNameException:
+
+        :raises InvalidReleaseIndexException:
+
+        :raises NoReleaseException:
+
+        :raises UnknownAssetException:
         """
-        pass
+
+        url = self.get_release_asset_download_link(repository_full_name,asset_name,release_number=release_number)
+
+        with open(f"{output_path}/{asset_name}" if output_path != "" else asset_name,"wb") as f:
+            f.write(get(url).content)
+            f.close()
 
 </details></dd>
 
-<dt id="github_api.github_api.github_api.get_raw_file_content">`<span>def <span class="ident">get_raw_file_content</span></span>(<span>self)</span>`</dt>
+<dt id="github_api.GithubHTTPApi.get_raw_file_content">`<span>def <span class="ident">get_raw_file_content</span></span>(<span>self, repository_full_name: str, file_name: str) ‑> str</span>`</dt>
 
 <dd>
 
 <div class="desc">
 
-coming soon
+:param repository_full_name: the repository full name like thaaoblues/github_api
+
+:param file_name: the file which you wanna get the raw content
+
+:raises InvalidRepoNameException:
+
+:raises UnknownFileException:
+
+:returns: a string containing the raw file content
 
 </div>
 
 <details class="source"><summary><span>Expand source code</span></summary>
 
-    def get_raw_file_content(self):
+    def get_raw_file_content(self,repository_full_name:str,file_name:str) -> str:
         """
-        coming soon
+        :param repository_full_name: the repository full name like thaaoblues/github_api
+
+        :param file_name: the file which you wanna get the raw content
+
+        :raises InvalidRepoNameException:
+
+        :raises UnknownFileException:
+
+        :returns: a string containing the raw file content
         """
-        pass
+
+        if not self.repo_exists(repository_full_name):
+            raise InvalidRepoNameException
+
+        content = get(f"{self.base_raw_url}{repository_full_name}/master/{file_name}").text
+
+        if content == "404: Not Found":
+            raise UnknownFileException
+
+        return content
 
 </details></dd>
 
-<dt id="github_api.github_api.github_api.get_release_asset_download_link">`<span>def <span class="ident">get_release_asset_download_link</span></span>(<span>) ‑> str</span>`</dt>
+<dt id="github_api.GithubHTTPApi.get_release_asset_download_link">`<span>def <span class="ident">get_release_asset_download_link</span></span>(<span>self, repository_full_name: str, asset_name: str, release_number: int = 0) ‑> str</span>`</dt>
 
 <dd>
 
 <div class="desc">
 
-coming soon
+:param repository_full_name: the repository full name like thaaoblues/github_api
+
+:param asset_name: the release asset file name
+
+:param release_number: (default is 0), the more you increase it, the more the release will be an old one.
+
+:returns: a string containing the release asset's download url
+
+:raises InvalidRepoNameException:
+
+:raises InvalidReleaseIndexException:
+
+:raises NoReleaseException:
+
+:raises UnknownAssetException:
 
 </div>
 
 <details class="source"><summary><span>Expand source code</span></summary>
 
-    def get_release_asset_download_link() -> str:
+    def get_release_asset_download_link(self,repository_full_name:str,asset_name:str,release_number:int=0) -> str:
         """
-        coming soon
+
+        :param repository_full_name: the repository full name like thaaoblues/github_api
+
+        :param asset_name: the release asset file name 
+
+        :param release_number:  (default is 0), the more you increase it, the more the release 
+        will be an old one.
+
+        :returns: a string containing the release asset's download url
+
+        :raises InvalidRepoNameException:
+
+        :raises InvalidReleaseIndexException:
+
+        :raises NoReleaseException:
+
+        :raises UnknownAssetException:
         """
-        pass
+
+        #get http response content
+        json = get(f"{self.base_repos_url}{repository_full_name}/releases").json()
+
+        #takes care of exceptions
+        if json == []:
+            raise NoReleaseException
+
+        elif not self.repo_exists(repository_full_name):
+            raise InvalidRepoNameException
+
+        elif release_number > len(json):
+            raise InvalidReleaseIndexException
+
+        json = json[release_number]
+
+        for asset in json['assets']:
+            if asset['name'] == asset_name:
+                return asset['browser_download_url']
+
+        raise UnknownAssetException
 
 </details></dd>
 
-<dt id="github_api.github_api.github_api.get_release_download_count">`<span>def <span class="ident">get_release_download_count</span></span>(<span>self, repository_full_name: str, release_number: int = 0) ‑> List[tuple]</span>`</dt>
+<dt id="github_api.GithubHTTPApi.get_release_download_count">`<span>def <span class="ident">get_release_download_count</span></span>(<span>self, repository_full_name: str, release_number: int = 0) ‑> List[tuple]</span>`</dt>
 
 <dd>
 
 <div class="desc">
 
-:param: release_number (default is 0), the more you increase it, the more the release will be an old one.
+:param repository_full_name: the repository full name like thaaoblues/github_api
+
+:param release_number: (default is 0), the more you increase it, the more the release will be an old one.
 
 :returns: the release download count by assets (list of tuples ('asset_name',downloads_count) (from the lastest release by default)
 
-:raises: InvalidRepoNameException
+:raises InvalidRepoNameException:
 
-:raises: InvalidReleaseIndexException
+:raises InvalidReleaseIndexException:
 
-:raises: NoReleaseException
+:raises NoReleaseException:
 
 </div>
 
@@ -605,15 +912,18 @@ coming soon
     def get_release_download_count(self,repository_full_name:str,release_number:int=0) -> List[tuple]:
         """
 
-        :param: release_number (default is 0), the more you increase it, the more the release will be an old one.
+        :param repository_full_name: the repository full name like thaaoblues/github_api
+
+        :param release_number: (default is 0), the more you increase it, the more the release 
+        will be an old one.
 
         :returns: the release download count by assets (list of tuples ('asset_name',downloads_count) (from the lastest release by default) 
 
-        :raises: InvalidRepoNameException
+        :raises InvalidRepoNameException:
 
-        :raises: InvalidReleaseIndexException
+        :raises InvalidReleaseIndexException:
 
-        :raises: NoReleaseException
+        :raises NoReleaseException:
 
         """
 
@@ -637,13 +947,15 @@ coming soon
 
 </details></dd>
 
-<dt id="github_api.github_api.github_api.get_release_infos">`<span>def <span class="ident">get_release_infos</span></span>(<span>self, repository_full_name: str, release_number: int = 0) ‑> List[dict]</span>`</dt>
+<dt id="github_api.GithubHTTPApi.get_release_infos">`<span>def <span class="ident">get_release_infos</span></span>(<span>self, repository_full_name: str, release_number: int = 0) ‑> List[dict]</span>`</dt>
 
 <dd>
 
 <div class="desc">
 
-:param: release_number (default is 0), the more you increase it, the more the release will be an old one.
+:param repository_full_name: the repository full name like thaaoblues/github_api
+
+:param release_number: (default is 0), the more you increase it, the more the release will be an old one.
 
 :returns: a dict of all the release stats that may be boring but quite usefull sometimes
 
@@ -661,11 +973,11 @@ coming soon
 
     - assets : assets files names (list of str)
 
-:raises: InvalidRepoNameException
+:raises InvalidRepoNameException:
 
-:raises: InvalidReleaseIndexException
+:raises InvalidReleaseIndexException:
 
-:raises: NoReleaseException
+:raises NoReleaseException:
 
 </div>
 
@@ -675,7 +987,9 @@ coming soon
 
         """
 
-        :param: release_number (default is 0), the more you increase it, the more the release 
+        :param repository_full_name: the repository full name like thaaoblues/github_api
+
+        :param release_number: (default is 0), the more you increase it, the more the release 
         will be an old one.
 
         :returns: a dict of all the release stats that may be boring but quite usefull sometimes
@@ -694,11 +1008,11 @@ coming soon
 
             - assets : assets files names (list of str)
 
-        :raises: InvalidRepoNameException
+        :raises InvalidRepoNameException:
 
-        :raises: InvalidReleaseIndexException
+        :raises InvalidReleaseIndexException:
 
-        :raises: NoReleaseException
+        :raises NoReleaseException:
 
         """
 
@@ -720,7 +1034,7 @@ coming soon
 
 </details></dd>
 
-<dt id="github_api.github_api.github_api.get_user_infos">`<span>def <span class="ident">get_user_infos</span></span>(<span>self, username: str) ‑> dict</span>`</dt>
+<dt id="github_api.GithubHTTPApi.get_user_infos">`<span>def <span class="ident">get_user_infos</span></span>(<span>self, username: str) ‑> dict</span>`</dt>
 
 <dd>
 
@@ -758,7 +1072,7 @@ get additionnal informations on a user like
 
 *   creation_date (str)
 
-:raises: UserNotFoundException if user is not found
+:raises UserNotFoundException if user is not found:
 
 :returns: A dict with the upper specified keys
 
@@ -801,7 +1115,7 @@ get additionnal informations on a user like
 
         - creation_date (str)
 
-        :raises: UserNotFoundException if user is not found
+        :raises UserNotFoundException if user is not found:
 
         :returns: A dict with the upper specified keys
 
@@ -822,7 +1136,7 @@ get additionnal informations on a user like
 
 </details></dd>
 
-<dt id="github_api.github_api.github_api.get_user_repos">`<span>def <span class="ident">get_user_repos</span></span>(<span>self, username: str) ‑> list</span>`</dt>
+<dt id="github_api.GithubHTTPApi.get_user_repos">`<span>def <span class="ident">get_user_repos</span></span>(<span>self, username: str) ‑> list</span>`</dt>
 
 <dd>
 
@@ -864,7 +1178,7 @@ list the publics repositories of the specified user
 
 </details></dd>
 
-<dt id="github_api.github_api.github_api.login">`<span>def <span class="ident">login</span></span>(<span>)</span>`</dt>
+<dt id="github_api.GithubHTTPApi.login">`<span>def <span class="ident">login</span></span>(<span>)</span>`</dt>
 
 <dd><details class="source"><summary><span>Expand source code</span></summary>
 
@@ -873,7 +1187,7 @@ list the publics repositories of the specified user
 
 </details></dd>
 
-<dt id="github_api.github_api.github_api.repo_exists">`<span>def <span class="ident">repo_exists</span></span>(<span>self, repository_full_name: str) ‑> bool</span>`</dt>
+<dt id="github_api.GithubHTTPApi.repo_exists">`<span>def <span class="ident">repo_exists</span></span>(<span>self, repository_full_name: str) ‑> bool</span>`</dt>
 
 <dd>
 
@@ -900,7 +1214,7 @@ list the publics repositories of the specified user
 
 </details></dd>
 
-<dt id="github_api.github_api.github_api.user_exists">`<span>def <span class="ident">user_exists</span></span>(<span>self, username: str) ‑> bool</span>`</dt>
+<dt id="github_api.GithubHTTPApi.user_exists">`<span>def <span class="ident">user_exists</span></span>(<span>self, username: str) ‑> bool</span>`</dt>
 
 <dd><details class="source"><summary><span>Expand source code</span></summary>
 
@@ -918,18 +1232,7 @@ list the publics repositories of the specified user
 
 </dd>
 
-</dl>
-
-
-</section>
-
-<section>
-
-## Exceptions
-
-<dl>
-
-<dt id="github_api.github_api.InvalidReleaseIndexException">`<span>class <span class="ident">InvalidReleaseIndexException</span></span> <span>(</span><span>message='Invalid release index. The user must not have released that amount of versions')</span>`</dt>
+<dt id="github_api.InvalidReleaseIndexException">`<span>class <span class="ident">InvalidReleaseIndexException</span></span> <span>(</span><span>message='Invalid release index. The user must not have released that amount of versions')</span>`</dt>
 
 <dd>
 
@@ -967,7 +1270,7 @@ message – explanation of the error
 
 </dd>
 
-<dt id="github_api.github_api.InvalidRepoNameException">`<span>class <span class="ident">InvalidRepoNameException</span></span> <span>(</span><span>message='Invalid repository name. It must look like : thaaoblues/github_api')</span>`</dt>
+<dt id="github_api.InvalidRepoNameException">`<span>class <span class="ident">InvalidRepoNameException</span></span> <span>(</span><span>message='Invalid repository name. It must look like : thaaoblues/github_api')</span>`</dt>
 
 <dd>
 
@@ -1005,7 +1308,7 @@ message – explanation of the error
 
 </dd>
 
-<dt id="github_api.github_api.NoReleaseException">`<span>class <span class="ident">NoReleaseException</span></span> <span>(</span><span>message='No release found. The user must not have released anything.')</span>`</dt>
+<dt id="github_api.NoReleaseException">`<span>class <span class="ident">NoReleaseException</span></span> <span>(</span><span>message='No release found. The user must not have released anything.')</span>`</dt>
 
 <dd>
 
@@ -1043,7 +1346,83 @@ message – explanation of the error
 
 </dd>
 
-<dt id="github_api.github_api.UserNotFoundException">`<span>class <span class="ident">UserNotFoundException</span></span> <span>(</span><span>message='Username not found on github.')</span>`</dt>
+<dt id="github_api.UnknownAssetException">`<span>class <span class="ident">UnknownAssetException</span></span> <span>(</span><span>message="No release's assets found with this name.")</span>`</dt>
+
+<dd>
+
+<div class="desc">
+
+Exception raised if you wanted to get download url for a specific release's asset but no assets has this name.
+
+## Attributes
+
+message – explanation of the error
+
+</div>
+
+<details class="source"><summary><span>Expand source code</span></summary>
+
+    class UnknownAssetException(Exception):
+        """
+        Exception raised if you wanted to get download url for a specific release's asset but no assets has this name.
+
+        Attributes:
+            message -- explanation of the error
+
+        """
+
+        def __init__(self, message="No release's assets found with this name."):
+            self.message = message
+            super().__init__(self.message)
+
+</details>
+
+### Ancestors
+
+*   builtins.Exception
+*   builtins.BaseException
+
+</dd>
+
+<dt id="github_api.UnknownFileException">`<span>class <span class="ident">UnknownFileException</span></span> <span>(</span><span>message='No file found with this name.')</span>`</dt>
+
+<dd>
+
+<div class="desc">
+
+Exception raised if you wanted to get raw content for a specific file but the file does not exists.
+
+## Attributes
+
+message – explanation of the error
+
+</div>
+
+<details class="source"><summary><span>Expand source code</span></summary>
+
+    class UnknownFileException(Exception):
+        """
+        Exception raised if you wanted to get raw content for a specific file but the file does not exists.
+
+        Attributes:
+            message -- explanation of the error
+
+        """
+
+        def __init__(self, message="No file found with this name."):
+            self.message = message
+            super().__init__(self.message)
+
+</details>
+
+### Ancestors
+
+*   builtins.Exception
+*   builtins.BaseException
+
+</dd>
+
+<dt id="github_api.UserNotFoundException">`<span>class <span class="ident">UserNotFoundException</span></span> <span>(</span><span>message='Username not found on github.')</span>`</dt>
 
 <dd>
 
@@ -1081,6 +1460,8 @@ message – explanation of the error
 
 </dd>
 
+</dl>
+
 </section>
 
 </article>
@@ -1089,31 +1470,31 @@ message – explanation of the error
 
 # Index
 
-*   ### Super-module
-
-    *   `[github_api](index.html "github_api")`
 *   ### [Classes](#header-classes)
 
-    *   #### `[InvalidReleaseIndexException](#github_api.github_api.InvalidReleaseIndexException "github_api.github_api.InvalidReleaseIndexException")`
+    *   #### `[GithubHTTPApi](#github_api.GithubHTTPApi "github_api.GithubHTTPApi")`
 
-    *   #### `[InvalidRepoNameException](#github_api.github_api.InvalidRepoNameException "github_api.github_api.InvalidRepoNameException")`
+        *   `[download_release_asset](#github_api.GithubHTTPApi.download_release_asset "github_api.GithubHTTPApi.download_release_asset")`
+        *   `[get_raw_file_content](#github_api.GithubHTTPApi.get_raw_file_content "github_api.GithubHTTPApi.get_raw_file_content")`
+        *   `[get_release_asset_download_link](#github_api.GithubHTTPApi.get_release_asset_download_link "github_api.GithubHTTPApi.get_release_asset_download_link")`
+        *   `[get_release_download_count](#github_api.GithubHTTPApi.get_release_download_count "github_api.GithubHTTPApi.get_release_download_count")`
+        *   `[get_release_infos](#github_api.GithubHTTPApi.get_release_infos "github_api.GithubHTTPApi.get_release_infos")`
+        *   `[get_user_infos](#github_api.GithubHTTPApi.get_user_infos "github_api.GithubHTTPApi.get_user_infos")`
+        *   `[get_user_repos](#github_api.GithubHTTPApi.get_user_repos "github_api.GithubHTTPApi.get_user_repos")`
+        *   `[login](#github_api.GithubHTTPApi.login "github_api.GithubHTTPApi.login")`
+        *   `[repo_exists](#github_api.GithubHTTPApi.repo_exists "github_api.GithubHTTPApi.repo_exists")`
+        *   `[user_exists](#github_api.GithubHTTPApi.user_exists "github_api.GithubHTTPApi.user_exists")`
+    *   #### `[InvalidReleaseIndexException](#github_api.InvalidReleaseIndexException "github_api.InvalidReleaseIndexException")`
 
-    *   #### `[NoReleaseException](#github_api.github_api.NoReleaseException "github_api.github_api.NoReleaseException")`
+    *   #### `[InvalidRepoNameException](#github_api.InvalidRepoNameException "github_api.InvalidRepoNameException")`
 
-    *   #### `[UserNotFoundException](#github_api.github_api.UserNotFoundException "github_api.github_api.UserNotFoundException")`
+    *   #### `[NoReleaseException](#github_api.NoReleaseException "github_api.NoReleaseException")`
 
-    *   #### `[github_api](#github_api.github_api.github_api "github_api.github_api.github_api")`
+    *   #### `[UnknownAssetException](#github_api.UnknownAssetException "github_api.UnknownAssetException")`
 
-        *   `[download_release_asset](#github_api.github_api.github_api.download_release_asset "github_api.github_api.github_api.download_release_asset")`
-        *   `[get_raw_file_content](#github_api.github_api.github_api.get_raw_file_content "github_api.github_api.github_api.get_raw_file_content")`
-        *   `[get_release_asset_download_link](#github_api.github_api.github_api.get_release_asset_download_link "github_api.github_api.github_api.get_release_asset_download_link")`
-        *   `[get_release_download_count](#github_api.github_api.github_api.get_release_download_count "github_api.github_api.github_api.get_release_download_count")`
-        *   `[get_release_infos](#github_api.github_api.github_api.get_release_infos "github_api.github_api.github_api.get_release_infos")`
-        *   `[get_user_infos](#github_api.github_api.github_api.get_user_infos "github_api.github_api.github_api.get_user_infos")`
-        *   `[get_user_repos](#github_api.github_api.github_api.get_user_repos "github_api.github_api.github_api.get_user_repos")`
-        *   `[login](#github_api.github_api.github_api.login "github_api.github_api.github_api.login")`
-        *   `[repo_exists](#github_api.github_api.github_api.repo_exists "github_api.github_api.github_api.repo_exists")`
-        *   `[user_exists](#github_api.github_api.github_api.user_exists "github_api.github_api.github_api.user_exists")`
+    *   #### `[UnknownFileException](#github_api.UnknownFileException "github_api.UnknownFileException")`
+
+    *   #### `[UserNotFoundException](#github_api.UserNotFoundException "github_api.UserNotFoundException")`
 
 </nav>
 
