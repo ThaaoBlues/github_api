@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: github-http-api
-Version: 0.2
+Version: 0.2.1
 Summary: A simple github HTTP api handler in python.
 Home-page: https://github.com/ThaaoBlues/github_api
 Author: _ThaaoBlues_
@@ -22,7 +22,13 @@ License-File: LICENSE
 
 <header>
 
-# Package `github_api`
+# Package `github_http_api`
+
+* available on [pypi](https://pypi.org/project/github-http-api/)
+
+* install it by typing ``python -m pip install github-http-api``
+
+* example of use available in the file [example.py](https://github.com/ThaaoBlues/github_api/blob/master/example.py)
 
 </header>
 
@@ -419,7 +425,7 @@ License-File: LICENSE
 
 <dl>
 
-<dt id="github_api.GithubHTTPApi">`<span>class <span class="ident">GithubHTTPApi</span></span>`</dt>
+<dt id="github_http_api.GithubHTTPApi">`<span>class <span class="ident">GithubHTTPApi</span></span>`</dt>
 
 <dd><details class="source"><summary><span>Expand source code</span></summary>
 
@@ -731,7 +737,7 @@ License-File: LICENSE
 
 <dl>
 
-<dt id="github_api.GithubHTTPApi.download_release_asset">`<span>def <span class="ident">download_release_asset</span></span>(<span>self, repository_full_name: str, asset_name: str, release_number: int = 0, output_path: str = '')</span>`</dt>
+<dt id="github_http_api.GithubHTTPApi.download_release_asset">`<span>def <span class="ident">download_release_asset</span></span>(<span>self, repository_full_name: str, asset_name: str, release_number: int = 0, output_path: str = '')</span>`</dt>
 
 <dd>
 
@@ -790,7 +796,7 @@ License-File: LICENSE
 
 </details></dd>
 
-<dt id="github_api.GithubHTTPApi.get_raw_file_content">`<span>def <span class="ident">get_raw_file_content</span></span>(<span>self, repository_full_name: str, file_name: str) ‑> str</span>`</dt>
+<dt id="github_http_api.GithubHTTPApi.get_raw_file_content">`<span>def <span class="ident">get_raw_file_content</span></span>(<span>self, repository_full_name: str, file_name: str) ‑> str</span>`</dt>
 
 <dd>
 
@@ -835,7 +841,7 @@ License-File: LICENSE
 
 </details></dd>
 
-<dt id="github_api.GithubHTTPApi.get_release_asset_download_link">`<span>def <span class="ident">get_release_asset_download_link</span></span>(<span>self, repository_full_name: str, asset_name: str, release_number: int = 0) ‑> str</span>`</dt>
+<dt id="github_http_api.GithubHTTPApi.get_release_asset_download_link">`<span>def <span class="ident">get_release_asset_download_link</span></span>(<span>self, repository_full_name: str, asset_name: str, release_number: int = 0) ‑> str</span>`</dt>
 
 <dd>
 
@@ -905,7 +911,7 @@ License-File: LICENSE
 
 </details></dd>
 
-<dt id="github_api.GithubHTTPApi.get_release_download_count">`<span>def <span class="ident">get_release_download_count</span></span>(<span>self, repository_full_name: str, release_number: int = 0) ‑> List[tuple]</span>`</dt>
+<dt id="github_http_api.GithubHTTPApi.get_release_download_count">`<span>def <span class="ident">get_release_download_count</span></span>(<span>self, repository_full_name: str, release_number: int = 0) ‑> List[tuple]</span>`</dt>
 
 <dd>
 
@@ -965,7 +971,7 @@ License-File: LICENSE
 
 </details></dd>
 
-<dt id="github_api.GithubHTTPApi.get_release_infos">`<span>def <span class="ident">get_release_infos</span></span>(<span>self, repository_full_name: str, release_number: int = 0) ‑> List[dict]</span>`</dt>
+<dt id="github_http_api.GithubHTTPApi.get_release_infos">`<span>def <span class="ident">get_release_infos</span></span>(<span>self, repository_full_name: str, release_number: int = 0) ‑> List[dict]</span>`</dt>
 
 <dd>
 
@@ -1052,7 +1058,7 @@ License-File: LICENSE
 
 </details></dd>
 
-<dt id="github_api.GithubHTTPApi.get_user_infos">`<span>def <span class="ident">get_user_infos</span></span>(<span>self, username: str) ‑> dict</span>`</dt>
+<dt id="github_http_api.GithubHTTPApi.get_user_infos">`<span>def <span class="ident">get_user_infos</span></span>(<span>self, username: str) ‑> dict</span>`</dt>
 
 <dd>
 
@@ -1154,7 +1160,7 @@ get additionnal informations on a user like
 
 </details></dd>
 
-<dt id="github_api.GithubHTTPApi.get_user_repos">`<span>def <span class="ident">get_user_repos</span></span>(<span>self, username: str) ‑> list</span>`</dt>
+<dt id="github_http_api.GithubHTTPApi.get_user_repos">`<span>def <span class="ident">get_user_repos</span></span>(<span>self, username: str) ‑> list</span>`</dt>
 
 <dd>
 
@@ -1196,7 +1202,7 @@ list the publics repositories of the specified user
 
 </details></dd>
 
-<dt id="github_api.GithubHTTPApi.login">`<span>def <span class="ident">login</span></span>(<span>)</span>`</dt>
+<dt id="github_http_api.GithubHTTPApi.login">`<span>def <span class="ident">login</span></span>(<span>)</span>`</dt>
 
 <dd><details class="source"><summary><span>Expand source code</span></summary>
 
@@ -1205,7 +1211,7 @@ list the publics repositories of the specified user
 
 </details></dd>
 
-<dt id="github_api.GithubHTTPApi.repo_exists">`<span>def <span class="ident">repo_exists</span></span>(<span>self, repository_full_name: str) ‑> bool</span>`</dt>
+<dt id="github_http_api.GithubHTTPApi.repo_exists">`<span>def <span class="ident">repo_exists</span></span>(<span>self, repository_full_name: str) ‑> bool</span>`</dt>
 
 <dd>
 
@@ -1232,7 +1238,7 @@ list the publics repositories of the specified user
 
 </details></dd>
 
-<dt id="github_api.GithubHTTPApi.user_exists">`<span>def <span class="ident">user_exists</span></span>(<span>self, username: str) ‑> bool</span>`</dt>
+<dt id="github_http_api.GithubHTTPApi.user_exists">`<span>def <span class="ident">user_exists</span></span>(<span>self, username: str) ‑> bool</span>`</dt>
 
 <dd><details class="source"><summary><span>Expand source code</span></summary>
 
@@ -1250,7 +1256,7 @@ list the publics repositories of the specified user
 
 </dd>
 
-<dt id="github_api.InvalidReleaseIndexException">`<span>class <span class="ident">InvalidReleaseIndexException</span></span> <span>(</span><span>message='Invalid release index. The user must not have released that amount of versions')</span>`</dt>
+<dt id="github_http_api.InvalidReleaseIndexException">`<span>class <span class="ident">InvalidReleaseIndexException</span></span> <span>(</span><span>message='Invalid release index. The user must not have released that amount of versions')</span>`</dt>
 
 <dd>
 
@@ -1288,7 +1294,7 @@ message – explanation of the error
 
 </dd>
 
-<dt id="github_api.InvalidRepoNameException">`<span>class <span class="ident">InvalidRepoNameException</span></span> <span>(</span><span>message='Invalid repository name. It must look like : thaaoblues/github_api')</span>`</dt>
+<dt id="github_http_api.InvalidRepoNameException">`<span>class <span class="ident">InvalidRepoNameException</span></span> <span>(</span><span>message='Invalid repository name. It must look like : thaaoblues/github_api')</span>`</dt>
 
 <dd>
 
@@ -1326,7 +1332,7 @@ message – explanation of the error
 
 </dd>
 
-<dt id="github_api.NoReleaseException">`<span>class <span class="ident">NoReleaseException</span></span> <span>(</span><span>message='No release found. The user must not have released anything.')</span>`</dt>
+<dt id="github_http_api.NoReleaseException">`<span>class <span class="ident">NoReleaseException</span></span> <span>(</span><span>message='No release found. The user must not have released anything.')</span>`</dt>
 
 <dd>
 
@@ -1364,7 +1370,7 @@ message – explanation of the error
 
 </dd>
 
-<dt id="github_api.UnknownAssetException">`<span>class <span class="ident">UnknownAssetException</span></span> <span>(</span><span>message="No release's assets found with this name.")</span>`</dt>
+<dt id="github_http_api.UnknownAssetException">`<span>class <span class="ident">UnknownAssetException</span></span> <span>(</span><span>message="No release's assets found with this name.")</span>`</dt>
 
 <dd>
 
@@ -1402,7 +1408,7 @@ message – explanation of the error
 
 </dd>
 
-<dt id="github_api.UnknownFileException">`<span>class <span class="ident">UnknownFileException</span></span> <span>(</span><span>message='No file found with this name.')</span>`</dt>
+<dt id="github_http_api.UnknownFileException">`<span>class <span class="ident">UnknownFileException</span></span> <span>(</span><span>message='No file found with this name.')</span>`</dt>
 
 <dd>
 
@@ -1440,7 +1446,7 @@ message – explanation of the error
 
 </dd>
 
-<dt id="github_api.UserNotFoundException">`<span>class <span class="ident">UserNotFoundException</span></span> <span>(</span><span>message='Username not found on github.')</span>`</dt>
+<dt id="github_http_api.UserNotFoundException">`<span>class <span class="ident">UserNotFoundException</span></span> <span>(</span><span>message='Username not found on github.')</span>`</dt>
 
 <dd>
 
@@ -1490,29 +1496,29 @@ message – explanation of the error
 
 *   ### [Classes](#header-classes)
 
-    *   #### `[GithubHTTPApi](#github_api.GithubHTTPApi "github_api.GithubHTTPApi")`
+    *   #### `[GithubHTTPApi](#github_http_api.GithubHTTPApi "github_http_api.GithubHTTPApi")`
 
-        *   `[download_release_asset](#github_api.GithubHTTPApi.download_release_asset "github_api.GithubHTTPApi.download_release_asset")`
-        *   `[get_raw_file_content](#github_api.GithubHTTPApi.get_raw_file_content "github_api.GithubHTTPApi.get_raw_file_content")`
-        *   `[get_release_asset_download_link](#github_api.GithubHTTPApi.get_release_asset_download_link "github_api.GithubHTTPApi.get_release_asset_download_link")`
-        *   `[get_release_download_count](#github_api.GithubHTTPApi.get_release_download_count "github_api.GithubHTTPApi.get_release_download_count")`
-        *   `[get_release_infos](#github_api.GithubHTTPApi.get_release_infos "github_api.GithubHTTPApi.get_release_infos")`
-        *   `[get_user_infos](#github_api.GithubHTTPApi.get_user_infos "github_api.GithubHTTPApi.get_user_infos")`
-        *   `[get_user_repos](#github_api.GithubHTTPApi.get_user_repos "github_api.GithubHTTPApi.get_user_repos")`
-        *   `[login](#github_api.GithubHTTPApi.login "github_api.GithubHTTPApi.login")`
-        *   `[repo_exists](#github_api.GithubHTTPApi.repo_exists "github_api.GithubHTTPApi.repo_exists")`
-        *   `[user_exists](#github_api.GithubHTTPApi.user_exists "github_api.GithubHTTPApi.user_exists")`
-    *   #### `[InvalidReleaseIndexException](#github_api.InvalidReleaseIndexException "github_api.InvalidReleaseIndexException")`
+        *   `[download_release_asset](#github_http_api.GithubHTTPApi.download_release_asset "github_http_api.GithubHTTPApi.download_release_asset")`
+        *   `[get_raw_file_content](#github_http_api.GithubHTTPApi.get_raw_file_content "github_http_api.GithubHTTPApi.get_raw_file_content")`
+        *   `[get_release_asset_download_link](#github_http_api.GithubHTTPApi.get_release_asset_download_link "github_http_api.GithubHTTPApi.get_release_asset_download_link")`
+        *   `[get_release_download_count](#github_http_api.GithubHTTPApi.get_release_download_count "github_http_api.GithubHTTPApi.get_release_download_count")`
+        *   `[get_release_infos](#github_http_api.GithubHTTPApi.get_release_infos "github_http_api.GithubHTTPApi.get_release_infos")`
+        *   `[get_user_infos](#github_http_api.GithubHTTPApi.get_user_infos "github_http_api.GithubHTTPApi.get_user_infos")`
+        *   `[get_user_repos](#github_http_api.GithubHTTPApi.get_user_repos "github_http_api.GithubHTTPApi.get_user_repos")`
+        *   `[login](#github_http_api.GithubHTTPApi.login "github_http_api.GithubHTTPApi.login")`
+        *   `[repo_exists](#github_http_api.GithubHTTPApi.repo_exists "github_http_api.GithubHTTPApi.repo_exists")`
+        *   `[user_exists](#github_http_api.GithubHTTPApi.user_exists "github_http_api.GithubHTTPApi.user_exists")`
+    *   #### `[InvalidReleaseIndexException](#github_http_api.InvalidReleaseIndexException "github_http_api.InvalidReleaseIndexException")`
 
-    *   #### `[InvalidRepoNameException](#github_api.InvalidRepoNameException "github_api.InvalidRepoNameException")`
+    *   #### `[InvalidRepoNameException](#github_http_api.InvalidRepoNameException "github_http_api.InvalidRepoNameException")`
 
-    *   #### `[NoReleaseException](#github_api.NoReleaseException "github_api.NoReleaseException")`
+    *   #### `[NoReleaseException](#github_http_api.NoReleaseException "github_http_api.NoReleaseException")`
 
-    *   #### `[UnknownAssetException](#github_api.UnknownAssetException "github_api.UnknownAssetException")`
+    *   #### `[UnknownAssetException](#github_http_api.UnknownAssetException "github_http_api.UnknownAssetException")`
 
-    *   #### `[UnknownFileException](#github_api.UnknownFileException "github_api.UnknownFileException")`
+    *   #### `[UnknownFileException](#github_http_api.UnknownFileException "github_http_api.UnknownFileException")`
 
-    *   #### `[UserNotFoundException](#github_api.UserNotFoundException "github_api.UserNotFoundException")`
+    *   #### `[UserNotFoundException](#github_http_api.UserNotFoundException "github_http_api.UserNotFoundException")`
 
 </nav>
 

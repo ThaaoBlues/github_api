@@ -16,7 +16,7 @@ URL = 'https://github.com/ThaaoBlues/github_api'
 EMAIL = 'thaaoblues81@gmail.com'
 AUTHOR = '_ThaaoBlues_'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.2'
+VERSION = '0.2.1'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -65,13 +65,13 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=["github_api"],
+    #packages=["github_http_api"],
     # If your package is a single module, use this instead of 'packages':
-    # py_modules=['mypackage'],
+    py_modules=['github_http_api'],
 
-    entry_points={
-         'console_scripts': ['pmanager_cli=pmanager.__main__:main'],
-    },
+    #entry_points={
+    #     'console_scripts': ['pmanager_cli=pmanager.__main__:main'],
+    #},
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,
