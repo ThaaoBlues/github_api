@@ -1,6 +1,6 @@
 from requests import get
 from typing import List
-
+from base64 import b64decode
 
 class GithubHTTPApi():
 
@@ -251,6 +251,8 @@ class GithubHTTPApi():
 
         raise UnknownAssetException
 
+
+
     def download_release_asset(self,repository_full_name:str,asset_name:str,release_number:int=0,output_path:str=""):
         """
 
@@ -280,6 +282,69 @@ class GithubHTTPApi():
         with open(f"{output_path}/{asset_name}" if output_path != "" else asset_name,"wb") as f:
             f.write(get(url).content)
             f.close()
+
+
+
+
+    def get_repo_license(self,repository_full_name:str)->dict:
+        """
+        
+        :param repository_full_name: the repository full name like thaaoblues/github_api
+
+        :returns: {'url':str,'name':str,'content':str,'type':str}:
+
+        :raises InvalidRepoNameException:
+        
+        """
+        
+        if not self.repo_exists(repository_full_name):
+            raise InvalidRepoNameException
+        
+        json = get(self.base_repos_url+repository_full_name+"/license").json()
+        
+        return {"url":json['html_url'],"name":json['name'],"content":b64decode(json['content']),"type":json['type']}
+
+        
+    def get_repo_issues(self,repository_full_name:str)->List[dict]:
+        """
+        
+        :param repository_full_name: the repository full name like thaaoblues/github_api
+
+        :returns: a list of dictionnary (1 by issue) containing:
+
+            - author : the issue's author username (str)
+
+            - created_at : the date/time when the author created the issue (str)
+
+            - updated_at : the date/time when the author modified the issue (str)
+
+            - title : the issue title (str)
+
+            - body : the issue's content (str)
+
+            - state : "open" or "closed"
+
+            - url : the url to open the issue on a web browser (str)
+
+            - labels : the issue labels List[str]
+
+            - comments_number : the number of comments under the issue (int)
+
+        :raises InvalidRepoNameException:
+        
+        """
+        
+        if not self.repo_exists(repository_full_name):
+            raise InvalidRepoNameException
+
+        
+        json = get(self.base_repos_url+repository_full_name+"/issues").json()
+
+        issues = []
+        for ele in json:
+            issues.append({"author":ele['user']['login'],"created_at":ele['created_at'],"updated_at":ele['updated_at'],"title":ele['title'],"body":ele['body'],"state":ele['state'],   "url":ele["url"],"labels":ele['labels'],"comments_number":ele['comments']})
+
+        return issues
         
 
 
@@ -318,6 +383,10 @@ class GithubHTTPApi():
         
         - creation_date (str)
 
+        - url (str)
+
+        - organizations (List[dict{'login','url'}])
+
         :raises UserNotFoundException if user is not found:
 
         :returns: A dict with the upper specified keys
@@ -332,10 +401,14 @@ class GithubHTTPApi():
 
         #getting infos from special urls
         followers = get(json['followers_url']).json()
+
         following = get(str(json['following_url']).replace("{/other_user}","",1)).json()
+
         starred_repos = [repo['html_url'] for repo in get(json['starred_url'].replace("{/owner}{/repo}","",1)).json()]
 
-        return {"id": json['id'],"bio":json['bio'],"name":json['name'],"twitter_account":json['twitter_username'],"followers" : [f['login'] for f in followers], "following":[f['login'] for f in following],"starred_repos": starred_repos,"blog_url":json['blog'],"is_hireable":json['hireable'],"email":json['email'],"user_location":json['location'],"user_type":json['type'],"avatar_url":json['avatar_url'],"company":json['company'],"creation_date":json['created_at']}
+        organizations = [{"login":org['login'],"url":org["url"]} for org in get(json['organizations_url']).json()]
+
+        return {"id": json['id'],"bio":json['bio'],"name":json['name'],"twitter_account":json['twitter_username'],"followers" : [f['login'] for f in followers], "following":[f['login'] for f in following],"starred_repos": starred_repos,"blog_url":json['blog'],"is_hireable":json['hireable'],"email":json['email'],"user_location":json['location'],"user_type":json['type'],"avatar_url":json['avatar_url'],"company":json['company'],"creation_date":json['created_at'],"url":json['url'],"organizations":organizations}
 
 
 
