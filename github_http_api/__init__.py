@@ -31,6 +31,29 @@ class GithubHTTPApi():
 
 
     #public methods :
+
+
+
+    def get_last_event_date(self,username:str)->str:
+        """
+        Basically just get the last event that an user made and return the date.
+        May be usefull to determine if an user is active or not.
+        
+        :returns: a string containing the date
+
+        :raises UnknownUserException: 
+
+        """
+
+
+        if not self.user_exists(username):
+            raise UserNotFoundException
+
+        return get(self.base_user_url+username+"/events").json()[0]['created_at']
+
+
+
+
     def try_determine_email(self,username:str,events_number:int=10)->List[str]:
         """
 
@@ -58,7 +81,6 @@ class GithubHTTPApi():
                     emails.append(commit['author']['email'])
 
         return list(set(emails))
-
 
 
     def user_exists(self,username:str)->bool:

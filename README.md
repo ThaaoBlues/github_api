@@ -44,7 +44,58 @@
                 return False
 
         #public methods :
+
+        def get_last_event_date(self,username:str)->str:
+            """
+            Basically just get the last event that an user made and return the date.
+            May be usefull to determine if an user is active or not.
+
+            :returns: a string containing the date
+
+            :raises UnknownUserException: 
+
+            """
+
+            if not self.user_exists(username):
+                raise UserNotFoundException
+
+            return get(self.base_user_url+username+"/events").json()[0]['created_at']
+
+        def try_determine_email(self,username:str,events_number:int=10)->List[str]:
+            """
+
+            tries to gather user email address by events api endpoint, it may be very usefull if the user didn't put it as personnal information and for OSINT people ;)
+
+            :param username: the username (str)
+
+            :returns: A list of potential email addresses (List[str])
+
+            :raises UserNotFoundException:
+
+            """
+
+            if not self.user_exists(username):
+                raise UserNotFoundException
+
+            json = get(self.base_user_url+username+"/events").json()[:events_number]
+
+            emails = []
+            for event in json:
+                if self.__is_json_key(event['payload'],'commits'):
+                    for commit in event['payload']['commits']:
+                        emails.append(commit['author']['email'])
+
+            return list(set(emails))
+
         def user_exists(self,username:str)->bool:
+
+            """
+
+            :param username: the username
+
+            :returns: a boolean
+
+            """
 
             #check if user exists
             if self.__is_json_key(get(self.base_user_url+username).json(),"message"):
@@ -502,7 +553,58 @@
                 return False
 
         #public methods :
+
+        def get_last_event_date(self,username:str)->str:
+            """
+            Basically just get the last event that an user made and return the date.
+            May be usefull to determine if an user is active or not.
+
+            :returns: a string containing the date
+
+            :raises UnknownUserException: 
+
+            """
+
+            if not self.user_exists(username):
+                raise UserNotFoundException
+
+            return get(self.base_user_url+username+"/events").json()[0]['created_at']
+
+        def try_determine_email(self,username:str,events_number:int=10)->List[str]:
+            """
+
+            tries to gather user email address by events api endpoint, it may be very usefull if the user didn't put it as personnal information and for OSINT people ;)
+
+            :param username: the username (str)
+
+            :returns: A list of potential email addresses (List[str])
+
+            :raises UserNotFoundException:
+
+            """
+
+            if not self.user_exists(username):
+                raise UserNotFoundException
+
+            json = get(self.base_user_url+username+"/events").json()[:events_number]
+
+            emails = []
+            for event in json:
+                if self.__is_json_key(event['payload'],'commits'):
+                    for commit in event['payload']['commits']:
+                        emails.append(commit['author']['email'])
+
+            return list(set(emails))
+
         def user_exists(self,username:str)->bool:
+
+            """
+
+            :param username: the username
+
+            :returns: a boolean
+
+            """
 
             #check if user exists
             if self.__is_json_key(get(self.base_user_url+username).json(),"message"):
@@ -908,6 +1010,40 @@
         with open(f"{output_path}/{asset_name}" if output_path != "" else asset_name,"wb") as f:
             f.write(get(url).content)
             f.close()
+
+</details></dd>
+
+<dt id="github_http_api.GithubHTTPApi.get_last_event_date">`<span>def <span class="ident">get_last_event_date</span></span>(<span>self, username: str) ‑> str</span>`</dt>
+
+<dd>
+
+<div class="desc">
+
+Basically just get the last event that an user made and return the date. May be usefull to determine if an user is active or not.
+
+:returns: a string containing the date
+
+:raises UnknownUserException:
+
+</div>
+
+<details class="source"><summary><span>Expand source code</span></summary>
+
+    def get_last_event_date(self,username:str)->str:
+        """
+        Basically just get the last event that an user made and return the date.
+        May be usefull to determine if an user is active or not.
+
+        :returns: a string containing the date
+
+        :raises UnknownUserException: 
+
+        """
+
+        if not self.user_exists(username):
+            raise UserNotFoundException
+
+        return get(self.base_user_url+username+"/events").json()[0]['created_at']
 
 </details></dd>
 
@@ -1477,11 +1613,75 @@ list the publics repositories of the specified user
 
 </details></dd>
 
+<dt id="github_http_api.GithubHTTPApi.try_determine_email">`<span>def <span class="ident">try_determine_email</span></span>(<span>self, username: str, events_number: int = 10) ‑> List[str]</span>`</dt>
+
+<dd>
+
+<div class="desc">
+
+tries to gather user email address by events api endpoint, it may be very usefull if the user didn't put it as personnal information and for OSINT people ;)
+
+:param username: the username (str)
+
+:returns: A list of potential email addresses (List[str])
+
+:raises UserNotFoundException:
+
+</div>
+
+<details class="source"><summary><span>Expand source code</span></summary>
+
+    def try_determine_email(self,username:str,events_number:int=10)->List[str]:
+        """
+
+        tries to gather user email address by events api endpoint, it may be very usefull if the user didn't put it as personnal information and for OSINT people ;)
+
+        :param username: the username (str)
+
+        :returns: A list of potential email addresses (List[str])
+
+        :raises UserNotFoundException:
+
+        """
+
+        if not self.user_exists(username):
+            raise UserNotFoundException
+
+        json = get(self.base_user_url+username+"/events").json()[:events_number]
+
+        emails = []
+        for event in json:
+            if self.__is_json_key(event['payload'],'commits'):
+                for commit in event['payload']['commits']:
+                    emails.append(commit['author']['email'])
+
+        return list(set(emails))
+
+</details></dd>
+
 <dt id="github_http_api.GithubHTTPApi.user_exists">`<span>def <span class="ident">user_exists</span></span>(<span>self, username: str) ‑> bool</span>`</dt>
 
-<dd><details class="source"><summary><span>Expand source code</span></summary>
+<dd>
+
+<div class="desc">
+
+:param username: the username
+
+:returns: a boolean
+
+</div>
+
+<details class="source"><summary><span>Expand source code</span></summary>
 
     def user_exists(self,username:str)->bool:
+
+        """
+
+        :param username: the username
+
+        :returns: a boolean
+
+        """
 
         #check if user exists
         if self.__is_json_key(get(self.base_user_url+username).json(),"message"):
@@ -1738,6 +1938,7 @@ message – explanation of the error
     *   #### `[GithubHTTPApi](#github_http_api.GithubHTTPApi "github_http_api.GithubHTTPApi")`
 
         *   `[download_release_asset](#github_http_api.GithubHTTPApi.download_release_asset "github_http_api.GithubHTTPApi.download_release_asset")`
+        *   `[get_last_event_date](#github_http_api.GithubHTTPApi.get_last_event_date "github_http_api.GithubHTTPApi.get_last_event_date")`
         *   `[get_raw_file_content](#github_http_api.GithubHTTPApi.get_raw_file_content "github_http_api.GithubHTTPApi.get_raw_file_content")`
         *   `[get_release_asset_download_link](#github_http_api.GithubHTTPApi.get_release_asset_download_link "github_http_api.GithubHTTPApi.get_release_asset_download_link")`
         *   `[get_release_download_count](#github_http_api.GithubHTTPApi.get_release_download_count "github_http_api.GithubHTTPApi.get_release_download_count")`
@@ -1748,6 +1949,7 @@ message – explanation of the error
         *   `[get_user_repos](#github_http_api.GithubHTTPApi.get_user_repos "github_http_api.GithubHTTPApi.get_user_repos")`
         *   `[login](#github_http_api.GithubHTTPApi.login "github_http_api.GithubHTTPApi.login")`
         *   `[repo_exists](#github_http_api.GithubHTTPApi.repo_exists "github_http_api.GithubHTTPApi.repo_exists")`
+        *   `[try_determine_email](#github_http_api.GithubHTTPApi.try_determine_email "github_http_api.GithubHTTPApi.try_determine_email")`
         *   `[user_exists](#github_http_api.GithubHTTPApi.user_exists "github_http_api.GithubHTTPApi.user_exists")`
     *   #### `[InvalidReleaseIndexException](#github_http_api.InvalidReleaseIndexException "github_http_api.InvalidReleaseIndexException")`
 

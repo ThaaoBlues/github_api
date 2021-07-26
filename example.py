@@ -5,13 +5,13 @@ gh = GithubHTTPApi()
 
 
 
-print(gh.try_determine_email("thaaoblues",events_number=20))
 
-"""
 
 #all functions
 
-print(gh.try_determine_email("RemiAlban"))
+print(gh.try_determine_email("thaaoblues"))
+
+print(gh.get_last_event_date("thaaoblues"))
 
 print(gh.get_raw_file_content("thaaoblues/github_api","README.md"))
 

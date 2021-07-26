@@ -16,7 +16,7 @@ URL = 'https://github.com/ThaaoBlues/github_api'
 EMAIL = 'thaaoblues81@gmail.com'
 AUTHOR = '_ThaaoBlues_'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.2.4'
+VERSION = '0.2.5'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
