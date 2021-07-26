@@ -21,6 +21,32 @@ class GithubHTTPApi():
 
 
 
+    def try_determine_email(self,username:str,events_number:int=10)->List[str]:
+        """
+
+        tries to gather user email address by events api endpoint, it may be very usefull if the user didn't put it as personnal information and for OSINT people ;)
+
+        :param username: the username (str)
+
+        :returns: A list of potential email addresses (List[str])
+
+
+        :raises UserNotFoundException:
+
+        """
+
+        if not self.user_exists(username):
+            raise UserNotFoundException
+
+        json = get(self.base_user_url+username+"/events").json()[:events_number]
+
+
+        emails = []
+        for event in json:
+            for commit in event['payload']['commits']:
+                emails.append(commit['author']['email'])
+
+        return list(set(emails))
 
     def __is_json_key(self,json:dict,key:str) -> bool:
         try:
@@ -34,12 +60,20 @@ class GithubHTTPApi():
     #public methods :
     def user_exists(self,username:str)->bool:
 
+        """
+        
+        :param username: the username
+
+        :returns: a boolean
+        
+        """
+
         #check if user exists
         if self.__is_json_key(get(self.base_user_url+username).json(),"message"):
             return False
         else:
             return True
-        
+
 
 
     def get_user_repos(self,username:str)-> list:

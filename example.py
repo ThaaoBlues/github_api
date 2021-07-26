@@ -4,7 +4,13 @@ from github_http_api import GithubHTTPApi
 gh = GithubHTTPApi()
 
 
+
+
+
 #all functions
+
+print(gh.try_determine_email("RemiAlban"))
+
 print(gh.get_raw_file_content("thaaoblues/github_api","README.md"))
 
 print(gh.get_repo_issues("copypastaofficial/copypasta"))
@@ -35,6 +41,11 @@ print(gh.get_repo_issues("copypastaofficial/copypasta"))
 # example : if you wanna print my bio content :
 print(gh.get_user_infos("thaaoblues")['bio'])
 
+# Oh no ! I didn't put an email ! 
+# Don't panick fellow OSINT enjoyer, you still could determine it with this function 
+# that will crawl trought a number of user-related events (10 by default)
+print(gh.try_determine_email("thaaoblues",events_number=20))
+
 # or even the email address of mark zuckerberg :
 print(gh.get_user_infos("im_a_reptilian")['email'])
 
@@ -53,5 +64,4 @@ print(gh.get_user_infos("thaaoblues")['followers'])
 
 # if you want more, just put you mouse over the function name on your IDE and 
 # it should display the docstring
-# if it don't, no problem. Just check the readme file.
-
+# if it don't, no problem. Just check the readme file."""
