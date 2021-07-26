@@ -21,6 +21,16 @@ class GithubHTTPApi():
 
 
 
+    def __is_json_key(self,json:dict,key:str) -> bool:
+        try:
+            json[key]
+            return True
+        except:
+            return False
+
+
+
+    #public methods :
     def try_determine_email(self,username:str,events_number:int=10)->List[str]:
         """
 
@@ -43,21 +53,14 @@ class GithubHTTPApi():
 
         emails = []
         for event in json:
-            for commit in event['payload']['commits']:
-                emails.append(commit['author']['email'])
+            if self.__is_json_key(event['payload'],'commits'):
+                for commit in event['payload']['commits']:
+                    emails.append(commit['author']['email'])
 
         return list(set(emails))
 
-    def __is_json_key(self,json:dict,key:str) -> bool:
-        try:
-            json[key]
-            return True
-        except:
-            return False
 
 
-
-    #public methods :
     def user_exists(self,username:str)->bool:
 
         """

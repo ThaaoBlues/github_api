@@ -5,7 +5,9 @@ gh = GithubHTTPApi()
 
 
 
+print(gh.try_determine_email("thaaoblues",events_number=20))
 
+"""
 
 #all functions
 
