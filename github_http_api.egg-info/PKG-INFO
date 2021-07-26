@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: github-http-api
-Version: 0.2.2
+Version: 0.2.4
 Summary: A simple github HTTP api handler in python.
 Home-page: https://github.com/ThaaoBlues/github_api
 Author: _ThaaoBlues_
